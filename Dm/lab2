@@ -1,0 +1,81 @@
+Create table panel(pmid int primary key, type varchar(10),price int,warranty int);
+
+Create table vendor(tin int primary key ,name varchar(10),contact int,address varchar(20));
+
+create table user(hno int primary key,address varchar(20));
+
+create table install (pmid int references panel(pmid),tin int references vendor(tin),hno int references user(hno),type varchar(20),date date,charge int, capacity varchar(20),noOfInstall int,primary key(pmid,tin,hno)); 
+
+
+1)list the distributor with most installations in domestic places
+SELECT v.name, COUNT(*) AS installation_count
+FROM install i
+JOIN vendor v ON i.tin = v.tin
+WHERE i.type = 'domestic'
+GROUP BY v.name
+ORDER BY installation_count DESC
+LIMIT 1;
+
+
+2)list the place name with highest capacity panel installed 
+SELECT u.address AS place_name
+FROM install i
+JOIN user u ON i.hno = u.hno
+ORDER BY i.capacity DESC
+LIMIT 1;
+
+3)display the area where monocrystalline panels are installed
+SELECT DISTINCT u.address AS area
+FROM install i
+JOIN user u ON i.hno = u.hno
+WHERE i.type = 'mono';
+
+4)for the specific area display the total installation charges for both type of pmodule
+SELECT i.type, SUM(i.charge) AS total_charge
+FROM install i
+JOIN user u ON i.hno = u.hno
+WHERE u.address = 'hubli'
+GROUP BY i.type;
+
+5)list the details of the distributor and panel that is the oldest installations
+
+SELECT v.*, p.*, i.date
+FROM install i
+JOIN vendor v ON i.tin = v.tin
+JOIN panel p ON i.pmid = p.pmid
+ORDER BY i.date ASC
+LIMIT 1;
+
+
+
+
+
+
+
+6)find the average sales of both type of panels in only commercial places
+
+SELECT i.type, AVG(i.charge) AS average_sales
+FROM install i
+WHERE i.type = 'commercial'
+GROUP BY i.type;
+
+
+
+
+INSERT INTO panel (pmid, type, price, warranty) VALUES (1, 'mono', 300, 10), (2, 'poly', 250, 8);
+
+
+INSERT INTO vendor (tin, name, contact, address) VALUES
+(101, 'VendorA', 123456, '123 Vendor St'),
+(102, 'VendorB', 987654, '456 Vendor Ave');
+
+INSERT INTO user (hno, address) VALUES (201, “hubli”), (202, “banglore”);
+
+INSERT INTO install (pmid, tin, hno, type, date, charge, capacity, noOfInstall) VALUES (1, 101, 201, 'mono', '2023-01-01', 5000, 'High', 2), (2, 101, 202, 'poly', '2023-02-01', 4000, 'Medium', 1), (1, 102, 201, 'mono', '2023-03-01', 5000, 'High', 3), (2, 102, 202, 'poly', '2023-04-01', 4000, 'Medium', 2);
+
+INSERT INTO install (pmid, tin, hno, type, date, charge, capacity, noOfInstall) VALUES
+(1, 101, 201, 'mono', '2023-01-01', 5000, 'High', 2),   
+(2, 101, 202, 'poly', '2023-02-01', 4000, 'Medium', 1), 
+(1, 102, 201, 'mono', '2023-03-01', 5000, 'High', 3),   
+(2, 102, 202, 'poly', '2023-04-01', 4000, 'Medium', 2); 
+
