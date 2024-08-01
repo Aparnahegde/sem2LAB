@@ -8,6 +8,7 @@ create table install (pmid int references panel(pmid),tin int references vendor(
 
 
 1)list the distributor with most installations in domestic places
+
 SELECT v.name, COUNT(*) AS installation_count
 FROM install i
 JOIN vendor v ON i.tin = v.tin
@@ -43,8 +44,7 @@ SELECT v.*, p.*, i.date
 FROM install i
 JOIN vendor v ON i.tin = v.tin
 JOIN panel p ON i.pmid = p.pmid
-ORDER BY i.date ASC
-LIMIT 1;
+ORDER BY i.date ASC LIMIT 1;
 
 
 
@@ -54,28 +54,57 @@ LIMIT 1;
 
 6)find the average sales of both type of panels in only commercial places
 
-SELECT i.type, AVG(i.charge) AS average_sales
-FROM install i
-WHERE i.type = 'commercial'
-GROUP BY i.type;
+SELECT i.type, AVG(i.charge) AS average_sales FROM install i  WHERE i.type = “commertial” GROUP BY i.type;
 
 
 
 
 INSERT INTO panel (pmid, type, price, warranty) VALUES (1, 'mono', 300, 10), (2, 'poly', 250, 8);
 
+INSERT INTO panel (pmid, type, price, warranty) VALUES
+(3, 'mono', 350, 12),
+(4, 'poly', 280, 10),
+(5, 'mono', 400, 15),
+(6, 'poly', 220, 7);
+
+
 
 INSERT INTO vendor (tin, name, contact, address) VALUES
-(101, 'VendorA', 123456, '123 Vendor St'),
-(102, 'VendorB', 987654, '456 Vendor Ave');
+(101, 'VendorA', 123456, “chennai”),
+(102, 'VendorB', 987654, “belgum”);
+
+
+INSERT INTO vendor (tin, name, contact, address) VALUES
+(103, 'VendorC', 543210, 'delhi'),
+(104, 'VendorD', 678901, 'mumbai'),
+(105, 'VendorE', 234567, 'kolkata');
+
+
 
 INSERT INTO user (hno, address) VALUES (201, “hubli”), (202, “banglore”);
 
-INSERT INTO install (pmid, tin, hno, type, date, charge, capacity, noOfInstall) VALUES (1, 101, 201, 'mono', '2023-01-01', 5000, 'High', 2), (2, 101, 202, 'poly', '2023-02-01', 4000, 'Medium', 1), (1, 102, 201, 'mono', '2023-03-01', 5000, 'High', 3), (2, 102, 202, 'poly', '2023-04-01', 4000, 'Medium', 2);
+INSERT INTO user (hno, address) VALUES
+(203, 'pune'),
+(204, 'hyderabad'),
+(205, 'chandigarh');
+
+
+
+
+
 
 INSERT INTO install (pmid, tin, hno, type, date, charge, capacity, noOfInstall) VALUES
-(1, 101, 201, 'mono', '2023-01-01', 5000, 'High', 2),   
-(2, 101, 202, 'poly', '2023-02-01', 4000, 'Medium', 1), 
-(1, 102, 201, 'mono', '2023-03-01', 5000, 'High', 3),   
-(2, 102, 202, 'poly', '2023-04-01', 4000, 'Medium', 2); 
+(1, 101, 201, “domestic”, '2023-01-01', 5000, 'High', 2),   
+(2, 101, 202, “commercial”, '2023-02-01', 4000, 'Medium', 1), 
+(1, 102, 201, “commercial”, '2023-03-01', 5000, 'High', 3),   
+(2, 102, 202, “domestic”, '2023-04-01', 4000, 'Medium', 2); 
 
+
+
+INSERT INTO install (pmid, tin, hno, type, date, charge, capacity, noOfInstall) VALUES
+(3, 103, 203, 'mono', '2023-05-01', 5500, 'High', 4),
+(4, 103, 204, 'poly', '2023-06-01', 4500, 'Medium', 2),
+(5, 104, 205, 'mono', '2023-07-01', 6000, 'High', 3),
+(6, 104, 203, 'poly', '2023-08-01', 3500, 'Low', 5),
+(3, 105, 204, 'mono', '2023-09-01', 5500, 'High', 2),
+(4, 105, 205, 'poly', '2023-10-01', 4700, 'Medium', 1);
