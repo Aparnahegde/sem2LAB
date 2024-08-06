@@ -1,0 +1,165 @@
+LAB1
+
+CREATE TABLE department (
+    Did INT NOT NULL PRIMARY KEY,
+    Dname VARCHAR(20) NOT NULL,
+    s_date DATE NOT NULL,
+    manager_SSN INT NOT NULL
+);
+
+
+
+CREATE TABLE employee (
+    SSN INT NOT NULL PRIMARY KEY,
+    fname VARCHAR(20) NOT NULL,
+    lname VARCHAR(20),
+    address VARCHAR(20),
+    bdate VARCHAR(20),
+    salary INT,
+    sex VARCHAR(20),
+    dno INT,
+    sup_SSN INT NOT NULL,
+    FOREIGN KEY (dno) REFERENCES department(Did),
+    FOREIGN KEY (sup_SSN) REFERENCES employee(SSN)
+);
+
+CREATE TABLE project (
+    pname VARCHAR(20),
+    pno INT NOT NULL PRIMARY KEY,
+    location VARCHAR(20),
+    dno INT,
+    FOREIGN KEY (dno) REFERENCES department(Did)
+);
+
+CREATE TABLE dependent (
+    ESSN VARCHAR(20) NOT NULL,
+    Dname VARCHAR(20) NOT NULL,
+    sex VARCHAR(10),
+    birthdate DATE,
+    relationship VARCHAR(20),
+    PRIMARY KEY (ESSN, Dname),
+    FOREIGN KEY (ESSN) REFERENCES employee(SSN)
+);
+
+CREATE TABLE workson (
+    ESSN INT NOT NULL,
+    pno INT NOT NULL,
+    hour INT NOT NULL,
+    PRIMARY KEY (ESSN, pno),
+    FOREIGN KEY (ESSN) REFERENCES employee(SSN),
+    FOREIGN KEY (pno) REFERENCES project(pno)
+);
+CREATE TABLE dept1 (
+    dno INT NOT NULL,
+    dlocation VARCHAR(20) NOT NULL,
+    PRIMARY KEY (dno, dlocation)
+);
+
+
+INSERT INTO department (Did, Dname, s_date, manager_SSN) VALUES
+(1, 'marketing', '2021-05-21', 100),
+(2, 'finance', '2012-02-23', 104),
+(3, 'R&D', '2012-04-23', 101),
+(4, 'MCA', '2021-05-12', 102);
+
+
+INSERT INTO employee (SSN, fname, lname, address, bdate, salary, sex, dno, sup_SSN) VALUES
+(100, 'raj', 'singh', 'bengaluru', '2000-03-23', 100000, 'male', 1, 100),
+(101, 'ragini', 'singh', 'bengaluru', '2002-03-22', 200000, 'female', 2, 100),
+(102, 'anvi', 'roy', 'bengaluru', '2000-03-24', 200000, 'female', 3, 101),
+(103, 'anand', 'shet', 'hubli', '2004-06-24', 250000, 'male', 4, 102);
+
+INSERT INTO project (pname, pno, location, dno) VALUES
+('frontend', 1000, 'bengaluru', 1),
+('backend', 1001, 'chennai', 2),
+('ML', 1002, 'hubli', 3),
+('DL', 1003, 'chennai', 4);
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+insert into dependent(ESSN,Dname,sex,birthdate,relationship) values (100,"marketing","M","1989-03-02","father");
+
+
+insert into dependent(ESSN,Dname,sex,birthdate,relationship) values (101,"finance","F","1992-05-02","mother");
+
+insert into dependent(ESSN,Dname,sex,birthdate,relationship) values (102,"R&D","M","1987-05-12","brother");
+
+insert into dependent(ESSN,Dname,sex,birthdate,relationship) values (103,"MCA","F","1999-05-08","mother");
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+insert into dept1(dno,dlocation) values(1,"Bengaluru"),(2,"Hyderabad"),(3,"Hubli"),(4,"Delhi");
+---------------------------------------------------------------------------------------------------------------------------
+insert into workson(ESSN,pno,hour)values(100,1000,4),(101,1001,3),(102,1002,2),(103,1003,1);
+
+
+1)List the first Name, last Name, dept_Name of the employer who draws a salary greater than the average salary of employees working for Finance department
+
+
+select fname,lname,d.Dname from employee e join department d on e.dno=d.Did where salary > (select AVG(salary) from employee where dno=2);
+
+2)List the name and department of the employee who is currently working on more than two project controlled by R&D department.
+
+
+insert into workson values(101,1002,5);
+insert into workson values(103,1002,2);
+insert into workson values(100,1002,6);
+
+SELECT e.fname AS Employee_First_Name, e.lname AS Employee_Last_Name, d.Dname AS Department_Name
+FROM employee e
+JOIN workson w ON e.SSN = w.ESSN
+JOIN project p ON w.pno = p.pno
+JOIN department d ON p.dno = d.Did
+WHERE d.Dname = 'R&D'
+GROUP BY e.SSN
+HAVING COUNT(*) > 2;
+
+
+
+3)List all the ongoing projects controlled by all the departments.
+SELECT p.pname AS Project_Name, d.Dname AS Department_Name
+FROM project p
+JOIN department d ON p.dno = d.Did;
+
+
+4) Give the details of the supervisor who is supervising more than 3 employees who have completed at least one project.
+
+SELECT sup.fname AS Supervisor_First_Name, sup.lname AS Supervisor_Last_Name, COUNT(e.SSN) AS Num_Employees_Supervised
+FROM employee e
+JOIN employee sup ON e.sup_SSN = sup.SSN
+JOIN workson w ON e.SSN = w.ESSN
+GROUP BY sup.SSN
+HAVING COUNT(*) > 3;
+
+5)List the name of the dependents employee who has completed a total_projects worth 10L.
+ALTER TABLE project ADD COLUMN worth DECIMAL(10, 2);
+
+ update project set worth=1000000 where pno=1000;
+ update project set worth=3000000 where pno=1001;
+ update project set worth=500000 where pno=1002;
+ update project set worth=1000000 where pno=1003;
+
+SELECT e.fname, e.lname
+FROM employee e
+JOIN dependent d ON e.SSN = d.ESSN
+WHERE e.SSN IN (
+    SELECT w.ESSN
+    FROM workson w
+    JOIN project p ON w.pno = p.pno
+    GROUP BY w.ESSN
+    HAVING SUM(p.worth) = 1000000
+);
+
+
+6) List the department and employee details whose project is in more than one city.
+
+SELECT d.Dname AS Department_Name, e.fname AS Employee_First_Name, e.lname AS Employee_Last_Name
+FROM employee e
+JOIN department d ON e.dno = d.Did
+WHERE EXISTS (
+    SELECT pno
+    FROM project p
+    WHERE p.dno = d.Did
+    GROUP BY pno
+    HAVING COUNT(DISTINCT location) > 1
+);
