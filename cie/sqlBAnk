@@ -1,0 +1,56 @@
+1)
+Select c.* from customer c
+JOIN customeraccount ca ON c.customer_SSN = ca.customer_SSN
+JOIN loanaccount la ON la.customer_SSN = ca.customer_SSN
+where ca.AccountNumber IN (
+    Select AccountNumber from customeraccount 
+    group by AccountNumber 
+    Having count(customer_SSN) > 1
+);
+
+
+2)
+Select b.* from Branch b
+JOIN Loan l ON b.Branch_ID = l.Branch_ID
+order by l.Amount DESC 
+limit 1;
+
+
+OR
+
+where l.Amount = (Select MAX(Amount) from Loan);
+
+
+3)
+Select a.AccountNumber, a.AccountType, a.Balance, b.BranchID, b.BranchName, 
+b.Address, b.Phone 
+from Account a 
+JOIN Branch b ON a.BranchID = b.BranchID
+JOIN Bank bk ON b.bankcode = bk.bankcode
+where a.AccountType = 'Saving' 
+AND bk.BankName = 'SBI' 
+AND b.Address Like '%Bangalore%';
+
+
+4)
+
+Select b.BranchName, ba.BankName, SUM(l.Amount)
+from Branch b 
+JOIN Bank ba ON b.BankCode = ba.BankCode
+JOIN Loan l ON b.BranchID = l.BranchID
+group by b.BranchName, ba.BankName;
+
+
+5)
+Select c.Name 
+from Customer c 
+JOIN CustomerAccount ca ON c.Customer_SSN = ca.Customer_SSN 
+JOIN Account a ON ca.Account_Number = a.Account_Number 
+JOIN Branch b ON a.BranchID = b.BranchID 
+where b.Address like '%[City Name]%' 
+group by c.Name 
+having count(Distinct b.BranchID) = (
+    Select count(Distinct b.BranchID) 
+    from Branch b 
+    where b.Address like '%[City Name]%'
+);
