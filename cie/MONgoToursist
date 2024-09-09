@@ -93,10 +93,8 @@ db.visits.aggregate([
 
 
 3)
-# First, find the number of tourist places in Karnataka
 places_in_karnataka = db.tourist_places.count_documents({"state": "Karnataka"})
 
-# Then, find tourists who visited all places in Karnataka
 db.visits.aggregate([
     {"$lookup": {
         "from": "tourist_places",
