@@ -1,0 +1,59 @@
+1)
+SELECT Name 
+FROM Professor
+WHERE PROFID NOT IN (
+    SELECT p.PROFID 
+    FROM project p 
+    JOIN P_W P 
+    ON p.PROJECTID = P.PROJECTID 
+    WHERE p.Budget > 1000 
+    AND p.End_Date >= CURDATE()
+);
+
+2)
+SELECT S.Name, P.Project_Name, Sponsor_Name 
+FROM Student S 
+JOIN Student_Assigned SAP 
+ON S.USN = SAP.USN 
+JOIN Project P 
+ON SAP.ProjectID = P.ProjectID 
+JOIN Professor Prof 
+ON P.PROFID = Prof.PROFID 
+WHERE S.degree_program = 'Graduate';
+
+
+3)
+SELECT P.Name, SUM(Proj.Budget) 
+FROM Professor P 
+JOIN PWP PWP 
+ON P.PROFID = PWP.PROFID 
+JOIN Project Proj 
+ON PWP.ProjectID = Proj.ProjectID 
+WHERE Proj.Start_Date > '2005-12-31' 
+AND Project_End_Date between '2010-01-01' and '2010-12-31' group by P.name;
+
+4)
+SELECT p.Name 
+FROM Professor p 
+JOIN PWP pw 
+ON p.PROFID = pw.PROFID 
+JOIN Project proj 
+ON pw.ProjectID = proj.ProjectID 
+GROUP BY p.Name 
+HAVING SUM(proj.Budget) > (
+    SELECT AVG(Budget) 
+    FROM Project
+);
+
+
+5)
+SELECT p.Name 
+FROM Professor p 
+JOIN Project_Work pw 
+ON p.PROFID = pw.PROFID 
+GROUP BY p.PROFID, p.Name 
+HAVING COUNT(DISTINCT pw.ProjectID) > (
+    SELECT COUNT(DISTINCT ProjectID) 
+    FROM Project
+);
+
