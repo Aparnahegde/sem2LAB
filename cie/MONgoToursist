@@ -1,0 +1,158 @@
+db.tourist_places.insert_many([
+    {
+        "tourist_place_id": 1,
+        "name": "Mysore Palace",
+        "state": "Karnataka",
+        "distance_from_capital": 150,
+        "history": "Historical palace built in 1912"
+    },
+    {
+        "tourist_place_id": 2,
+        "name": "Taj Mahal",
+        "state": "Uttar Pradesh",
+        "distance_from_capital": 220,
+        "history": "Built by Mughal emperor Shah Jahan in memory of his wife Mumtaz Mahal."
+    }
+])
+
+
+
+db.tourists.insert_many([
+    {
+        "tourist_id": "T001",
+        "name": "Alice",
+        "age": 25,
+        "country": "USA",
+        "emails": ["alice@example.com", "alice.work@example.com"]
+    },
+    {
+        "tourist_id": "T002",
+        "name": "Bob",
+        "age": 30,
+        "country": "Canada",
+        "emails": ["bob@example.com"]
+    }
+])
+
+
+db.visits.insert_many([
+    {
+        "visit_id": 1,
+        "tourist_id": "T001",
+        "tourist_place_id": 1,
+        "visited_date": "2023-09-01"
+    },
+    {
+        "visit_id": 2,
+        "tourist_id": "T002",
+        "tourist_place_id": 1,
+        "visited_date": "2023-08-20"
+    },
+    {
+        "visit_id": 3,
+        "tourist_id": "T001",
+        "tourist_place_id": 2,
+        "visited_date": "2023-07-15"
+    }
+])
+
+
+1)
+db.tourist_places.aggregate([
+    {
+        "$group": {
+            "_id": "$state",
+            "num_places": {"$sum": 1}
+        }
+    },
+    {"$sort": {"num_places": -1}},
+    {"$limit": 1}
+])
+
+
+2)
+db.visits.aggregate([
+    {
+        "$group": {
+            "_id": "$tourist_place_id",
+            "num_visits": {"$sum": 1}
+        }
+    },
+    {"$sort": {"num_visits": -1}},
+    {"$limit": 1},
+    {
+        "$lookup": {
+            "from": "tourist_places",
+            "localField": "_id",
+            "foreignField": "tourist_place_id",
+            "as": "tourist_place"
+        }
+    },
+    {"$unwind": "$tourist_place"}
+])
+
+
+3)
+# First, find the number of tourist places in Karnataka
+places_in_karnataka = db.tourist_places.count_documents({"state": "Karnataka"})
+
+# Then, find tourists who visited all places in Karnataka
+db.visits.aggregate([
+    {"$lookup": {
+        "from": "tourist_places",
+        "localField": "tourist_place_id",
+        "foreignField": "tourist_place_id",
+        "as": "place_info"
+    }},
+    {"$match": {"place_info.state": "Karnataka"}},
+    {"$group": {
+        "_id": "$tourist_id",
+        "places_visited": {"$sum": 1}
+    }},
+    {"$match": {"places_visited": places_in_karnataka}}
+])
+
+4)
+
+db.visits.aggregate([
+    {"$lookup": {
+        "from": "tourist_places",
+        "localField": "tourist_place_id",
+        "foreignField": "tourist_place_id",
+        "as": "place_info"
+    }},
+    {"$group": {
+        "_id": "$tourist_id",
+        "states_visited": {"$addToSet": "$place_info.state"}
+    }},
+    {
+        "$match": {
+            "states_visited": {"$all": ["Karnataka", "Uttar Pradesh"]}  # adjust to include all states
+        }
+    }
+])
+
+
+5)
+
+db.visits.aggregate([
+    {"$lookup": {
+        "from": "tourists",
+        "localField": "tourist_id",
+        "foreignField": "tourist_id",
+        "as": "tourist_info"
+    }},
+    {"$lookup": {
+        "from": "tourist_places",
+        "localField": "tourist_place_id",
+        "foreignField": "tourist_place_id",
+        "as": "place_info"
+    }},
+    {"$unwind": "$tourist_info"},
+    {"$group": {
+        "_id": "$place_info.name",
+        "countries_visited": {"$addToSet": "$tourist_info.country"}
+    }},
+    {"$match": {"countries_visited": {"$all": ["USA", "India", "Canada"]}}}  # all countries
+])
+
