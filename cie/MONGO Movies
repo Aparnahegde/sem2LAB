@@ -1,3 +1,114 @@
+db.movies.insertMany([
+  {
+    _id: ObjectId("movie1"),
+    title: "Scary Night",
+    genre: "horror",
+    year: 2012,
+    directors: [ObjectId("dir1"), ObjectId("dir2"), ObjectId("dir3")],
+    productionCompany: ObjectId("prod1")
+  },
+  {
+    _id: ObjectId("movie2"),
+    title: "Scary Night",
+    genre: "horror",
+    year: 1998,
+    directors: [ObjectId("dir4")],
+    productionCompany: ObjectId("prod2")
+  },
+  {
+    _id: ObjectId("movie3"),
+    title: "Scary Night",
+    genre: "horror",
+    year: 2012,
+    directors: [ObjectId("dir5"), ObjectId("dir6")],
+    productionCompany: ObjectId("prod2")
+  },
+  {
+    _id: ObjectId("movie4"),
+    title: "Thriller Night",
+    genre: "horror",
+    year: 2015,
+    directors: [ObjectId("dir1"), ObjectId("dir2")],
+    productionCompany: ObjectId("prod3")
+  }
+]);
+
+
+
+
+db.actors.insertMany([
+  {
+    _id: ObjectId("actor1"),
+    name: "John Doe",
+    dateOfBirth: ISODate("1980-04-12"),
+    movies: [ObjectId("movie1"), ObjectId("movie2")]
+  },
+  {
+    _id: ObjectId("actor2"),
+    name: "Jane Smith",
+    dateOfBirth: ISODate("1985-06-22"),
+    movies: [ObjectId("movie3"), ObjectId("movie4")]
+  }
+]);
+
+
+db.directors.insertMany([
+  {
+    _id: ObjectId("dir1"),
+    name: "Director One",
+    dateOfBirth: ISODate("1980-04-12"),
+    movies: [ObjectId("movie1"), ObjectId("movie4")]
+  },
+  {
+    _id: ObjectId("dir2"),
+    name: "Director Two",
+    dateOfBirth: ISODate("1985-06-22"),
+    movies: [ObjectId("movie1"), ObjectId("movie4")]
+  },
+  {
+    _id: ObjectId("dir3"),
+    name: "Director Three",
+    dateOfBirth: ISODate("1975-09-13"),
+    movies: [ObjectId("movie1")]
+  },
+  {
+    _id: ObjectId("dir4"),
+    name: "Director Four",
+    dateOfBirth: ISODate("1987-02-05"),
+    movies: [ObjectId("movie2")]
+  }
+]);
+
+
+db.productionCompanies.insertMany([
+  {
+    _id: ObjectId("prod1"),
+    name: "Horror Studios",
+    movies: [ObjectId("movie1")]
+  },
+  {
+    _id: ObjectId("prod2"),
+    name: "Thriller Entertainment",
+    movies: [ObjectId("movie2"), ObjectId("movie3")]
+  },
+  {
+    _id: ObjectId("prod3"),
+    name: "Scare Corp",
+    movies: [ObjectId("movie4")]
+  }
+]);
+
+
+
+
+
+
+
+
+
+
+
+
 // a) List the details of horror movies released in 2012 and directed by more than 2 directors
 db.movies.aggregate([
   { $match: { genre: "horror", year: 2012 } },
