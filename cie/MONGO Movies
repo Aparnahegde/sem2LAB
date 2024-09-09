@@ -1,0 +1,45 @@
+// a) List the details of horror movies released in 2012 and directed by more than 2 directors
+db.movies.aggregate([
+  { $match: { genre: "horror", year: 2012 } },
+  { $match: { "directors.2": { $exists: true } } }
+]);
+
+// b) List the details of actors who acted in movies with the same titles but released before 2000 and after 2010
+db.movies.aggregate([
+  { $match: { year: { $in: [ { $lt: 2000 }, { $gt: 2010 } ] } } },
+  { $group: { _id: "$title", movies: { $push: "$_id" } } },
+  { $match: { "movies.1": { $exists: true } } },
+  { $lookup: { from: "actors", localField: "movies", foreignField: "movies", as: "actorsDetails" } },
+  { $unwind: "$actorsDetails" },
+  { $project: { _id: 0, actor: "$actorsDetails.name", movies: "$movies" } }
+]);
+
+// c) List the details of production companies producing the most movies
+db.productionCompanies.aggregate([
+  { $lookup: { from: "movies", localField: "_id", foreignField: "productionCompany", as: "producedMovies" } },
+  { $project: { name: 1, movieCount: { $size: "$producedMovies" } } },
+  { $sort: { movieCount: -1 } },
+  { $limit: 1 }
+]);
+
+// d) List the details of movies where the director and actor have the same date of birth
+db.actors.aggregate([
+  { $lookup: { from: "directors", localField: "dateOfBirth", foreignField: "dateOfBirth", as: "matchingDirectors" } },
+  { $unwind: "$matchingDirectors" },
+  { $lookup: { from: "movies", localField: "movies", foreignField: "_id", as: "actorMovies" } },
+  { $unwind: "$actorMovies" },
+  { $lookup: { from: "movies", localField: "matchingDirectors.movies", foreignField: "_id", as: "directorMovies" } },
+  { $unwind: "$directorMovies" },
+  { $match: { $expr: { $eq: ["$actorMovies._id", "$directorMovies._id"] } } },
+  { $project: { movie: "$actorMovies.title", director: "$matchingDirectors.name", actor: "$name" } }
+]);
+
+// e) Retrieve the names of directors who directed all the movies produced by any one production company
+db.productionCompanies.aggregate([
+  { $lookup: { from: "movies", localField: "_id", foreignField: "productionCompany", as: "producedMovies" } },
+  { $unwind: "$producedMovies" },
+  { $lookup: { from: "directors", localField: "producedMovies.directors", foreignField: "_id", as: "directors" } },
+  { $group: { _id: "$directors._id", name: { $first: "$directors.name" }, directedMovies: { $addToSet: "$producedMovies._id" } } },
+  { $match: { $expr: { $eq: [ { $size: "$directedMovies" }, { $size: { $setIntersection: [ "$directedMovies", "$producedMovies._id" ] } } ] } },
+  { $project: { name: 1 } }
+]);
