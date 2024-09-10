@@ -4,14 +4,14 @@ db.tourist_places.insert_many([
         "name": "Mysore Palace",
         "state": "Karnataka",
         "distance_from_capital": 150,
-        "history": "Historical palace built in 1912"
+        "history": "Historical palace"
     },
     {
         "tourist_place_id": 2,
         "name": "Taj Mahal",
         "state": "Uttar Pradesh",
         "distance_from_capital": 220,
-        "history": "Built by Mughal emperor Shah Jahan in memory of his wife Mumtaz Mahal."
+        "history": "Built by Mughal emperor"
     }
 ])
 
@@ -125,7 +125,7 @@ db.visits.aggregate([
     }},
     {
         "$match": {
-            "states_visited": {"$all": ["Karnataka", "Uttar Pradesh"]}  # adjust to include all states
+            "states_visited": {"$all": ["Karnataka", "Uttar Pradesh"]} 
         }
     }
 ])
