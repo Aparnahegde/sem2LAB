@@ -4,32 +4,57 @@ db.movies.insertMany([
     title: "Scary Night",
     genre: "horror",
     year: 2012,
-    directors: [ObjectId("dir1"), ObjectId("dir2"), ObjectId("dir3")],
-    productionCompany: ObjectId("prod1")
+    actors: [
+      { _id: ObjectId("actor1"), name: "John Doe" },
+      { _id: ObjectId("actor2"), name: "Jane Smith" }
+    ],
+    directors: [
+      { _id: ObjectId("dir1"), name: "Director One" },
+      { _id: ObjectId("dir2"), name: "Director Two" },
+      { _id: ObjectId("dir3"), name: "Director Three" }
+    ],
+    productionCompany: { _id: ObjectId("prod1"), name: "Horror Studios" }
   },
   {
     _id: ObjectId("movie2"),
     title: "Scary Night",
     genre: "horror",
     year: 1998,
-    directors: [ObjectId("dir4")],
-    productionCompany: ObjectId("prod2")
+    actors: [
+      { _id: ObjectId("actor1"), name: "John Doe" }
+    ],
+    directors: [
+      { _id: ObjectId("dir4"), name: "Director Four" }
+    ],
+    productionCompany: { _id: ObjectId("prod2"), name: "Thriller Entertainment" }
   },
   {
     _id: ObjectId("movie3"),
     title: "Scary Night",
     genre: "horror",
     year: 2012,
-    directors: [ObjectId("dir5"), ObjectId("dir6")],
-    productionCompany: ObjectId("prod2")
+    actors: [
+      { _id: ObjectId("actor2"), name: "Jane Smith" }
+    ],
+    directors: [
+      { _id: ObjectId("dir5"), name: "Director Five" },
+      { _id: ObjectId("dir6"), name: "Director Six" }
+    ],
+    productionCompany: { _id: ObjectId("prod2"), name: "Thriller Entertainment" }
   },
   {
     _id: ObjectId("movie4"),
     title: "Thriller Night",
     genre: "horror",
     year: 2015,
-    directors: [ObjectId("dir1"), ObjectId("dir2")],
-    productionCompany: ObjectId("prod3")
+    actors: [
+      { _id: ObjectId("actor2"), name: "Jane Smith" }
+    ],
+    directors: [
+      { _id: ObjectId("dir1"), name: "Director One" },
+      { _id: ObjectId("dir2"), name: "Director Two" }
+    ],
+    productionCompany: { _id: ObjectId("prod3"), name: "Scare Corp" }
   }
 ]);
 
@@ -41,13 +66,19 @@ db.actors.insertMany([
     _id: ObjectId("actor1"),
     name: "John Doe",
     dateOfBirth: ISODate("1980-04-12"),
-    movies: [ObjectId("movie1"), ObjectId("movie2")]
+    movies: [
+      { _id: ObjectId("movie1"), title: "Scary Night" },
+      { _id: ObjectId("movie2"), title: "Scary Night" }
+    ]
   },
   {
     _id: ObjectId("actor2"),
     name: "Jane Smith",
     dateOfBirth: ISODate("1985-06-22"),
-    movies: [ObjectId("movie3"), ObjectId("movie4")]
+    movies: [
+      { _id: ObjectId("movie3"), title: "Scary Night" },
+      { _id: ObjectId("movie4"), title: "Thriller Night" }
+    ]
   }
 ]);
 
@@ -57,25 +88,51 @@ db.directors.insertMany([
     _id: ObjectId("dir1"),
     name: "Director One",
     dateOfBirth: ISODate("1980-04-12"),
-    movies: [ObjectId("movie1"), ObjectId("movie4")]
+    movies: [
+      { _id: ObjectId("movie1"), title: "Scary Night" },
+      { _id: ObjectId("movie4"), title: "Thriller Night" }
+    ]
   },
   {
     _id: ObjectId("dir2"),
     name: "Director Two",
     dateOfBirth: ISODate("1985-06-22"),
-    movies: [ObjectId("movie1"), ObjectId("movie4")]
+    movies: [
+      { _id: ObjectId("movie1"), title: "Scary Night" },
+      { _id: ObjectId("movie4"), title: "Thriller Night" }
+    ]
   },
   {
     _id: ObjectId("dir3"),
     name: "Director Three",
     dateOfBirth: ISODate("1975-09-13"),
-    movies: [ObjectId("movie1")]
+    movies: [
+      { _id: ObjectId("movie1"), title: "Scary Night" }
+    ]
   },
   {
     _id: ObjectId("dir4"),
     name: "Director Four",
     dateOfBirth: ISODate("1987-02-05"),
-    movies: [ObjectId("movie2")]
+    movies: [
+      { _id: ObjectId("movie2"), title: "Scary Night" }
+    ]
+  },
+  {
+    _id: ObjectId("dir5"),
+    name: "Director Five",
+    dateOfBirth: ISODate("1982-11-11"),
+    movies: [
+      { _id: ObjectId("movie3"), title: "Scary Night" }
+    ]
+  },
+  {
+    _id: ObjectId("dir6"),
+    name: "Director Six",
+    dateOfBirth: ISODate("1979-03-22"),
+    movies: [
+      { _id: ObjectId("movie3"), title: "Scary Night" }
+    ]
   }
 ]);
 
@@ -84,19 +141,27 @@ db.productionCompanies.insertMany([
   {
     _id: ObjectId("prod1"),
     name: "Horror Studios",
-    movies: [ObjectId("movie1")]
+    movies: [
+      { _id: ObjectId("movie1"), title: "Scary Night" }
+    ]
   },
   {
     _id: ObjectId("prod2"),
     name: "Thriller Entertainment",
-    movies: [ObjectId("movie2"), ObjectId("movie3")]
+    movies: [
+      { _id: ObjectId("movie2"), title: "Scary Night" },
+      { _id: ObjectId("movie3"), title: "Scary Night" }
+    ]
   },
   {
     _id: ObjectId("prod3"),
     name: "Scare Corp",
-    movies: [ObjectId("movie4")]
+    movies: [
+      { _id: ObjectId("movie4"), title: "Thriller Night" }
+    ]
   }
 ]);
+
 
 
 
